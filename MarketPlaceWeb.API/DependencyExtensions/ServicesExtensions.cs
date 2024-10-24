@@ -18,7 +18,7 @@ namespace MarketPlaceWeb.API.Extensions
 
         public static void AddRepositories(this IServiceCollection services)
         {
-            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IProductImagesRepository, ProductRepository>();
             services.AddScoped<ICateogryRepository, CategoryRepository>();
         }
 

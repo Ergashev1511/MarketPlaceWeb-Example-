@@ -24,10 +24,29 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
             try
             {
                 if (category == null) throw new ArgumentNullException("Category is not null");
-                
 
-                var hascopy=await _dbContext.categories.AnyAsync(a=>a.CategoryName == category.CategoryName);
 
+                var hascopy = await _dbContext.categories.AnyAsync(a => a.Name == category.Name);
+                if (hascopy) throw new Exception("This Category already exist");
+               
+                await _dbContext.categories.AddAsync(category);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> AddChildCategory(Category category)
+        {
+            try
+            {
+                if (category == null) throw new ArgumentNullException("Category is not null");
+
+
+                var hascopy = await _dbContext.categories.AnyAsync(a => a.Name == category.Name);
                 if (hascopy) throw new Exception("This Category already exist");
 
                 await _dbContext.categories.AddAsync(category);
@@ -60,7 +79,8 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
         {
             try
             {
-                return await _dbContext.categories.Include(a=>a.products).ToListAsync();
+              return await _dbContext.categories.Include(s=>s.ParentCategory).ToListAsync();
+ 
             }
             catch 
             {
@@ -68,17 +88,33 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
             }
         }
 
+        public async Task<List<Category>> GetAllChildCategories(long parentId)
+        {
+            try
+            {
+                return await _dbContext.categories.
+                    Where(a=>a.Id==parentId).
+                    Include(s=>s.ParentCategory).
+                    ToListAsync();
+            }
+            catch
+            {
+                return new List<Category>();
+            }
+        }
+
         public async Task<Category> GetCategoryById(long id)
         {
             try
             {
-                var category=await _dbContext.categories.FirstOrDefaultAsync(a=>a.Id==id);
+                var category=await _dbContext.categories.Include(s=>s.ParentCategory).FirstOrDefaultAsync(a=>a.Id==id);
                 if (category == null) throw new Exception("Category not found!");
 
                 return category;
             }
-            catch
+            catch(Exception ex) 
             {
+                Console.WriteLine(ex.Message);
                 return new Category();
             }
         }
@@ -89,9 +125,10 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
             {
                 var oldCategory=await _dbContext.categories.FirstOrDefaultAsync(a=>a.Id==Id);
                 if (oldCategory == null) throw new Exception("Category not found!");
-                 
-                oldCategory.CategoryName = category.CategoryName;
+
+                oldCategory.Name = category.Name;
                 oldCategory.Describtion = category.Describtion;
+                oldCategory.ParentCategoryId = category.ParentCategoryId;
 
                 _dbContext.categories.Update(oldCategory);
                 await _dbContext.SaveChangesAsync();

@@ -9,7 +9,7 @@ namespace MarketPlaceWeb.DataAccess.Repositories.IRepository
 {
     public interface IProductRepository
     {
-        Task<bool> AddProduct(Product product);
+        Task<long> AddProduct(Product product);
         Task<bool> UpdateProduct(Product product,long Id);
         Task<bool> DeleteProduct(long Id);
         Task<List<Product>> GetAllProduct();

@@ -1,4 +1,5 @@
-﻿using MarketPlaceWeb.Services.DTO;
+﻿using MarketPlaceWeb.Domain.Entities;
+using MarketPlaceWeb.Services.DTO;
 using MarketPlaceWeb.Services.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace MarketPlaceWeb.Services.Services.IServices
 {
     public interface IProductService
     {
-        Task<bool> AddProduct(ProductDto productDto);
+        Task<long> AddProduct(ProductDto productDto);
         Task<bool> UpdateProduct(ProductDto productDto, long Id);
         Task<bool> DeleteProduct(long Id);
         Task<List<ProductViewModel>> GetAllProduct();

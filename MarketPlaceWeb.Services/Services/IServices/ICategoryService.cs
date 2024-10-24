@@ -1,4 +1,5 @@
-﻿using MarketPlaceWeb.Services.DTO;
+﻿using MarketPlaceWeb.Domain.Entities;
+using MarketPlaceWeb.Services.DTO;
 using MarketPlaceWeb.Services.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -15,5 +16,6 @@ namespace MarketPlaceWeb.Services.Services.IServices
         Task<bool> DeleteCategory(long id);
         Task<List<CategoryViewModel>> GetAllCategory();
         Task<CategoryViewModel> GetCategoryById(long id);
+        Task<List<CategoryViewModel>> GetAllChildCategories(long parentId);
     }
 }
