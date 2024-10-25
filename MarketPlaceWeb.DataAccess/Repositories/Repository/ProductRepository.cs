@@ -17,23 +17,23 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
         {
             _dbContext = dbContext;
         }
-        public async Task<bool> AddProduct(Product product)
+        public async Task<long> AddProduct(Product product)
         {
             try
             {
                 if (product == null) throw new ArgumentNullException("Product is not null");
 
 
-                var hascopy=await _dbContext.products.AnyAsync(a=>a.ProductName==product.ProductName);
+                var hascopy = await _dbContext.products.AnyAsync(a => a.Name == product.Name);
                 if (hascopy) throw new Exception("This Product already exist!");
 
                 await _dbContext.products.AddAsync(product);
                 await _dbContext.SaveChangesAsync();
-                return true;
+                return product.Id;
             }
             catch
             {
-                return false;
+                return 0;
             }
         }
 
@@ -58,7 +58,8 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
         {
             try
             {
-                return await _dbContext.products.ToListAsync();
+                return await _dbContext.products.
+                    Include(s=>s.Category).ToListAsync();
             }
             catch
             {
@@ -89,13 +90,12 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
 
                 if (oldProduct == null) throw new Exception("Product not found!");
 
-                oldProduct.ProductName = product.ProductName;
+                oldProduct.Name = product.Name;
                 oldProduct.Describtion = product.Describtion;
                 oldProduct.Price = product.Price;
-                oldProduct.ImageName = product.ImageName;
                 oldProduct.CategoryId = product.CategoryId;
 
-               
+
                 _dbContext.products.Update(oldProduct);
                 await _dbContext.SaveChangesAsync();
 

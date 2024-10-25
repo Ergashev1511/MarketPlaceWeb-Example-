@@ -9,11 +9,11 @@ namespace MarketPlaceWeb.Domain.Entities
 {
     public class Product : BaseEntity
     {
-        public string ProductName { get; set; }=string.Empty;
+        public string Name { get; set; }=string.Empty;
         public string Describtion { get; set; }=string.Empty ;
         public decimal Price { get; set; }
-        public string ImageName { get; set; } = string.Empty;
         public long?  CategoryId { get; set; }
-        public Category? category { get; set; }
+        public Category? Category { get; set; }
+        public List<ProductImages> ProductImages { get; set; }
     }
 }

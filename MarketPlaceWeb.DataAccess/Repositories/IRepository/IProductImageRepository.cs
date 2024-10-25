@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MarketPlaceWeb.Domain.Entities.Base
+namespace MarketPlaceWeb.DataAccess.Repositories.IRepository
 {
-    public abstract class BaseEntity : AuditEntity
+    public interface IProductImageRepository
     {
-        public long  Id { get; set; }
+        
     }
 }

@@ -9,8 +9,11 @@ namespace MarketPlaceWeb.Domain.Entities
 {
     public class Category : BaseEntity
     {
-        public string CategoryName { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
         public string Describtion { get; set; } = string.Empty;
-        public virtual List<Product> products { get; set; }
+        public long?  ParentCategoryId { get; set; }
+        public Category? ParentCategory { get; set; }
+        public virtual List<Category> ChildCategories { get; set; }
+        public virtual List<Product> Products { get; set; }
     }
 }

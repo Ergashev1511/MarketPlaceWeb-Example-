@@ -18,18 +18,19 @@ namespace MarketPlaceWeb.Services.Services.Services
         {
            _repository = repositorye;
         }
-        public async Task<bool> AddProduct(ProductDto productDto)
+        public async Task<long> AddProduct(ProductDto productDto)
         {
-            Product product=new Product()
+            Product product = new Product
             {
-                ProductName = productDto.ProductName,
+                Name = productDto.Name,
                 Describtion = productDto.Describtion,
                 Price = productDto.Price,
-                ImageName = productDto.ImageName,
-                CategoryId = productDto.CategoryId
+                CategoryId = productDto.CategoryId,
             };
-            await _repository.AddProduct(product);
-            return true;
+
+
+            var Id = await _repository.AddProduct(product);
+            return Id;
         }
 
         public async Task<bool> DeleteProduct(long Id)
@@ -41,16 +42,20 @@ namespace MarketPlaceWeb.Services.Services.Services
         {
             var products=await _repository.GetAllProduct();
 
-            return products.Select(a=> new ProductViewModel()
+            return products.Select(a => new ProductViewModel
             {
-
                 Id = a.Id,
-                ProductName = a.ProductName,
+                Name = a.Name,
                 Describtion = a.Describtion,
                 Price = a.Price,
-                ImageName = a.ImageName,
-                CategoryId=a.CategoryId.Value
+                CategoryViewModel = new CategoryViewModel
+                {
+                    Id = a.Category?.Id ?? 0,
+                    Name = a.Category?.Name ?? "Unknown",
+                    Description = a.Category?.Describtion ?? "No description", 
+                }
             }).ToList();
+
         }
 
         public async Task<ProductViewModel> GetProductById(long Id)
@@ -59,12 +64,15 @@ namespace MarketPlaceWeb.Services.Services.Services
 
             ProductViewModel productViewModel = new ProductViewModel()
             {
-                Id = product.Id,
-                ProductName = product.ProductName,
+                Name = product.Name,
                 Describtion = product.Describtion,
                 Price = product.Price,
-                ImageName = product.ImageName,
-               CategoryId=product.CategoryId.Value
+                CategoryViewModel = new CategoryViewModel
+                {
+                    Id = product.Category?.Id ?? 0,
+                    Name = product.Category?.Name ?? "Unknown",
+                    Description = product.Category?.Describtion ?? "No description",
+                }
             };
             
             return productViewModel;
@@ -74,10 +82,9 @@ namespace MarketPlaceWeb.Services.Services.Services
         {
             Product product = new Product()
             {
-                ProductName = productDto.ProductName,
+                Name = productDto.Name,
                 Describtion = productDto.Describtion,
                 Price = productDto.Price,
-                ImageName = productDto.ImageName,
                 CategoryId = productDto.CategoryId
             };
              await _repository.UpdateProduct(product,Id);

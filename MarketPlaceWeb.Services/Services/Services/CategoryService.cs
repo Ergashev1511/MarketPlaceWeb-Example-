@@ -20,13 +20,25 @@ namespace MarketPlaceWeb.Services.Services.Services
         }
         public async Task<bool> AddCategory(CategoryDto categoryDto)
         {
-            Category category = new Category()
+            if(categoryDto.ParentCategoryId == null || categoryDto.ParentCategoryId==0)
             {
-                CategoryName=categoryDto.CategoryName,
-                Describtion=categoryDto.Description
-            };
+                Category Parentcategory = new Category()
+                {
+                   Name = categoryDto.Name,
+                   Describtion = categoryDto.Description,
+                   ParentCategoryId = null,
+                };
+                await _repository.AddCategory(Parentcategory);
+                return true;
+            }
 
-            await _repository.AddCategory(category);
+            Category ChildCategory = new Category()
+            {
+                Name = categoryDto.Name,
+                Describtion = categoryDto.Description,
+                ParentCategoryId = categoryDto.ParentCategoryId,
+            };
+            await _repository.AddChildCategory(ChildCategory);
             return true;
         }
 
@@ -39,12 +51,35 @@ namespace MarketPlaceWeb.Services.Services.Services
         public async Task<List<CategoryViewModel>> GetAllCategory()
         {
             var categories=await _repository.GetAllCategory();
-            return categories.Select(c => new CategoryViewModel()
+            return categories.Select(a => new CategoryViewModel()
             {
-                Id=c.Id,
-                CategoryName=c.CategoryName,
-                Description=c.Describtion
-            }).ToList();    
+                Id = a.Id,
+                Name = a.Name,
+                Description = a.Describtion,
+                ParentCategory = a.ParentCategory != null ? new CategoryViewModel
+                {
+                    Id = a.ParentCategory.Id,
+                    Name = a.ParentCategory.Name,
+                    Description = a.Describtion,
+                } : null
+            }).ToList();
+        }
+
+        public async Task<List<CategoryViewModel>> GetAllChildCategories(long parentId)
+        {
+            var categories = await _repository.GetAllChildCategories(parentId);
+            return categories.Select(a => new CategoryViewModel()
+            {
+                Id = a.Id,
+                Name = a.Name,
+                Description = a.Describtion,
+                ParentCategory = a.ParentCategory != null ? new CategoryViewModel
+                {
+                    Id = a.ParentCategory.Id,
+                    Name = a.ParentCategory.Name,
+                    Description = a.Describtion,
+                } : null
+            }).ToList();
         }
 
         public async Task<CategoryViewModel> GetCategoryById(long id)
@@ -54,8 +89,14 @@ namespace MarketPlaceWeb.Services.Services.Services
             CategoryViewModel categorydto = new CategoryViewModel()
             {
                 Id=cateogry.Id,
-                CategoryName = cateogry.CategoryName,
-                Description= cateogry.Describtion
+                Name = cateogry.Name,
+                Description = cateogry.Describtion,
+                ParentCategory = cateogry.ParentCategory != null ? new CategoryViewModel
+                {
+                    Id = cateogry.ParentCategory.Id,
+                    Name = cateogry.ParentCategory.Name,
+                    Description = cateogry.Describtion,
+                } : null
             };
             return categorydto;
         }
@@ -64,8 +105,9 @@ namespace MarketPlaceWeb.Services.Services.Services
         {
             Category category = new Category()
             {
-                CategoryName=categoryDto.CategoryName,
-                Describtion=categoryDto.Description
+                Name = categoryDto.Name,
+                Describtion=categoryDto.Description,
+                ParentCategoryId=categoryDto.ParentCategoryId,
             };
 
             await _repository.UpdateCategory(category, Id);
