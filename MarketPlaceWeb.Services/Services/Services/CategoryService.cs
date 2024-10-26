@@ -1,10 +1,13 @@
-﻿using MarketPlaceWeb.DataAccess.Repositories.IRepository;
+﻿using FluentValidation;
+using MarketPlaceWeb.DataAccess.Repositories.IRepository;
 using MarketPlaceWeb.Domain.Entities;
+using MarketPlaceWeb.Services.Common.Exceptions;
 using MarketPlaceWeb.Services.DTO;
 using MarketPlaceWeb.Services.Services.IServices;
 using MarketPlaceWeb.Services.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,13 +17,21 @@ namespace MarketPlaceWeb.Services.Services.Services
     public class CategoryService : ICategoryService
     {
         private readonly ICateogryRepository _repository;
-        public CategoryService(ICateogryRepository repository)
+        private readonly IValidator<CategoryDto> _validator;
+        public CategoryService(ICateogryRepository repository,IValidator<CategoryDto> validator)
         {
             _repository = repository;
+            _validator = validator;
         }
         public async Task<bool> AddCategory(CategoryDto categoryDto)
         {
-            if(categoryDto.ParentCategoryId == null || categoryDto.ParentCategoryId==0)
+            var validationResult = _validator.Validate(categoryDto);
+            if (!validationResult.IsValid)
+            {
+                throw new ValidatorException(validationResult.Errors.First().ErrorMessage);
+            }
+
+            if (categoryDto.ParentCategoryId == null || categoryDto.ParentCategoryId==0)
             {
                 Category Parentcategory = new Category()
                 {
