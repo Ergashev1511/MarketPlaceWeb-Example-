@@ -12,7 +12,7 @@ namespace MarketPlaceWeb.DataAccess.Repositories.IRepository
         Task<bool> AddCategory(Category category);
         Task<bool> AddChildCategory(Category category);
         Task<bool> UpdateCategory(Category category,long Id);
-        Task<bool> DeleteCategory(long id);
+        Task<bool> DeleteCategory(Category category);
         Task<IEnumerable<Category>> GetAllCategory();
         Task<Category> GetCategoryById(long id);
         Task<List<Category>> GetAllChildCategories(long parentId);

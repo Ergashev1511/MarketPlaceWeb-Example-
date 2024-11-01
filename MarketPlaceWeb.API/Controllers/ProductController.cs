@@ -1,5 +1,6 @@
 ﻿using MarketPlaceWeb.Services.DTO;
-using MarketPlaceWeb.Services.Services.IServices;
+using MarketPlaceWeb.Services.MediatR.Commands.ProductQuery;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,40 +10,55 @@ namespace MarketPlaceWeb.API.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly IProductService _service;
-        public ProductController(IProductService service)
+        private readonly IMediator  _mediator;
+        public ProductController(IMediator mediator)
         {
-            _service = service; 
+            _mediator = mediator;
         }
+        
 
         [HttpPost("Create")]
-        public async ValueTask<IActionResult> CreateProduct(ProductDto productDto)
+        public async ValueTask<IActionResult> CreateProduct([FromBody]CreateProductCommand productDto)
         {
-            return Ok(await _service.AddProduct(productDto));
+            var res=await _mediator.Send(productDto);
+            return Ok(res);
         }
 
         [HttpDelete("{Id}")]
         public async ValueTask<IActionResult> DeleteProduct(long Id)
         {
-            return Ok(await _service.DeleteProduct(Id));    
+            var res=await _mediator.Send(new DeleteProductCommand { Id = Id });
+            return NoContent();
         }
 
         [HttpGet("{Id}")]
         public async ValueTask<IActionResult>  GetByIdProduct(long Id)
         {
-            return Ok(await _service.GetProductById(Id));
+            var res=await _mediator.Send(new GetByIdProductQuery { Id = Id });  
+            return Ok(res);
         }
 
         [HttpGet("GetAll")]
         public async ValueTask<IActionResult> GetAllProduct()
         {
-            return Ok(await _service.GetAllProduct());
+            var res = await _mediator.Send(new GetAllProductQuery());
+            return Ok(res);
         }
 
         [HttpPut("{Id}")]
-        public async ValueTask<IActionResult> UpdateProduct(ProductDto productDto, long Id)
+        public async ValueTask<IActionResult> UpdateProduct([FromBody] UpdateProductCommand command, long Id)
         {
-            return Ok(await _service.UpdateProduct(productDto, Id));
+            if (Id != command.Id)
+            {
+                return BadRequest();
+            }
+
+            var res = await _mediator.Send(command);
+            if (!res)
+            {
+                NotFound();
+            }
+            return NoContent();
         }
 
     }

@@ -23,12 +23,6 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
         {
             try
             {
-                if (category == null) throw new ArgumentNullException("Category is not null");
-
-
-                var hascopy = await _dbContext.categories.AnyAsync(a => a.Name == category.Name);
-                if (hascopy) throw new Exception("This Category already exist");
-               
                 await _dbContext.categories.AddAsync(category);
                 await _dbContext.SaveChangesAsync();
                 return true;
@@ -43,12 +37,6 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
         {
             try
             {
-                if (category == null) throw new ArgumentNullException("Category is not null");
-
-
-                var hascopy = await _dbContext.categories.AnyAsync(a => a.Name == category.Name);
-                if (hascopy) throw new Exception("This Category already exist");
-
                 await _dbContext.categories.AddAsync(category);
                 await _dbContext.SaveChangesAsync();
                 return true;
@@ -59,12 +47,10 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
             }
         }
 
-        public async Task<bool> DeleteCategory(long id)
+        public async Task<bool> DeleteCategory(Category category)
         {
             try
             {
-                var category=await _dbContext.categories.FirstOrDefaultAsync(a=>a.Id==id);
-                if (category == null) throw new Exception("Category not found!");
                 _dbContext.categories.Remove(category);
                 await _dbContext.SaveChangesAsync();
                 return true;
@@ -108,8 +94,7 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
             try
             {
                 var category=await _dbContext.categories.Include(s=>s.ParentCategory).FirstOrDefaultAsync(a=>a.Id==id);
-                if (category == null) throw new Exception("Category not found!");
-
+         
                 return category;
             }
             catch(Exception ex) 
@@ -123,14 +108,7 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
         {
             try
             {
-                var oldCategory=await _dbContext.categories.FirstOrDefaultAsync(a=>a.Id==Id);
-                if (oldCategory == null) throw new Exception("Category not found!");
-
-                oldCategory.Name = category.Name;
-                oldCategory.Describtion = category.Describtion;
-                oldCategory.ParentCategoryId = category.ParentCategoryId;
-
-                _dbContext.categories.Update(oldCategory);
+                _dbContext.categories.Update(category);
                 await _dbContext.SaveChangesAsync();
                 return true;
             }

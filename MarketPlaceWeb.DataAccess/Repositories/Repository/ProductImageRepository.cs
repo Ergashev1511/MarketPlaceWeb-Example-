@@ -21,7 +21,6 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
         {
             try
             {
-                if (productImages == null) throw new ArgumentNullException("ProductImages is not null!");
 
                 await _dbContext.ProductImages.AddAsync(productImages);
                 await _dbContext.SaveChangesAsync();
@@ -35,14 +34,11 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
             }
         }
 
-        public async Task<bool> DeleteImage(long Id)
+        public async Task<bool> DeleteImage(ProductImages productImages)
         {
             try
             {
-                var productImage=await _dbContext.ProductImages.FirstOrDefaultAsync(x => x.Id == Id);
-                if (productImage == null) throw new Exception("ProductImage not found!");
-
-                _dbContext.ProductImages.Remove(productImage);
+                _dbContext.ProductImages.Remove(productImages);
                 await _dbContext.SaveChangesAsync();
                 return true;
             }
@@ -71,7 +67,6 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
             try
             {
                 var productImage = await _dbContext.ProductImages.Include(a=>a.Product).FirstOrDefaultAsync(c=>c.Id==Id);
-                if (productImage == null) throw new Exception("ProductImage not found!");
                 return productImage;
             }
             catch (Exception ex)
@@ -86,21 +81,7 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
 
             try
             {
-                var oldProductImage = await _dbContext.ProductImages
-                    .FirstOrDefaultAsync(c => c.Id == Id);
-
-                if (oldProductImage == null)
-                    throw new Exception("ProductImage not found!");
-
-               
-                oldProductImage.ImageName = productImages.ImageName;
-
-                if (oldProductImage.ProductId != productImages.ProductId)
-                {
-                    oldProductImage.ProductId = productImages.ProductId;
-                }
-
-                 _dbContext.ProductImages.Update(oldProductImage);
+                 _dbContext.ProductImages.Update(productImages);
                 await _dbContext.SaveChangesAsync();
                 return true;
                 // Xato bo'lishi mumkin Debug qilib tekshiraman

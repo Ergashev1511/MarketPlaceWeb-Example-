@@ -1,5 +1,5 @@
-﻿using MarketPlaceWeb.Services.MediatR.Commands.ProductImageQuery;
-using MarketPlaceWeb.Services.Services.IServices;
+﻿using MarketPlaceWeb.DataAccess.Repositories.IRepository;
+using MarketPlaceWeb.Services.MediatR.Commands.ProductImageQuery;
 using MarketPlaceWeb.Services.ViewModels;
 using MediatR;
 using System;
@@ -12,16 +12,21 @@ namespace MarketPlaceWeb.Services.MediatR.Handler.ProductImageHandler
 {
     public class GetByIdProductImageQueryHandler : IRequestHandler<GetByIdProductImageQuery, ProductImageViewModel>
     {
-        private readonly IProductImageService _service;
-        public GetByIdProductImageQueryHandler(IProductImageService service)
+        private readonly IProductImageRepository _repository;
+        public GetByIdProductImageQueryHandler(IProductImageRepository repository)
         {
-            _service = service;
+            _repository = repository;
         }
         public async Task<ProductImageViewModel> Handle(GetByIdProductImageQuery request, CancellationToken cancellationToken)
         {
-            var productImage = await _service.GetByIdProductImage(request.Id);
-            if (productImage == null) return new ProductImageViewModel();
-            return productImage;
+            var productImage = await _repository.GetByIdImages(request.Id);
+            ProductImageViewModel viewModel = new ProductImageViewModel()
+            {
+                Id = productImage.Id,
+                Name = productImage.ImageName,
+                ProductId = productImage.ProductId
+            };
+            return viewModel;
         }
     }
 }

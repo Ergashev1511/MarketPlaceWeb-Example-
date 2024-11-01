@@ -1,30 +1,31 @@
-﻿using MarketPlaceWeb.Domain.Entities;
+﻿using MarketPlaceWeb.DataAccess.Repositories.IRepository;
+using MarketPlaceWeb.Domain.Entities;
+using MarketPlaceWeb.Services.DTO;
 using MarketPlaceWeb.Services.MediatR.Commands.ProductImageQuery;
-using MarketPlaceWeb.Services.Services.IServices;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace MarketPlaceWeb.Services.MediatR.Handler.ProductImageHandler
 {
     public class CreateProductImageCommandHandler : IRequestHandler<CreateProductImageCommand, bool>
     {
-        private readonly IProductImageService _service;
-        public CreateProductImageCommandHandler(IProductImageService service)
+        private readonly IProductImageRepository _repository;
+        
+        public CreateProductImageCommandHandler(IProductImageRepository  repository)
         {
-            _service = service; 
+            _repository = repository; 
         }
         public async Task<bool> Handle(CreateProductImageCommand request, CancellationToken cancellationToken)
         {
-            var productImage = new DTO.ProductImagesDto
+           /* var validationResult = _validator.Validate(productImagesDto);
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors.First().ErrorMessage);
+            }*/
+            ProductImages productImages = new ProductImages()
             {
                 ImageName = request.ImageName,
-                ProductId = request.ProductId
+                ProductId = request.ProductId,
             };
-            await _service.AddProductImage(productImage);
+            await _repository.AddImage(productImages);
             return true;
         }
     }
