@@ -1,8 +1,11 @@
 ﻿using MarketPlaceWeb.Services.DTO;
-using MarketPlaceWeb.Services.Services.IServices;
+using MarketPlaceWeb.Services.MediatR.Commands.CategoryQuery;
+using MarketPlaceWeb.Services.MediatR.Commands.ProductImageQuery;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace MarketPlaceWeb.API.Controllers
 {
@@ -10,40 +13,54 @@ namespace MarketPlaceWeb.API.Controllers
     [ApiController]
     public class CategoryController : ControllerBase
     {
-        private readonly ICategoryService _service;
-        public CategoryController(ICategoryService service)
+        private readonly IMediator _mediator;
+        public CategoryController(IMediator mediator)
         {
-            _service = service;
+            _mediator = mediator;   
         }
 
         [HttpPost("Create")]
-        public async ValueTask<IActionResult> CreateCategory(CategoryDto category)
+        public async ValueTask<IActionResult> CreateCategory([FromBody]CreateCategoryCommands category)
         {
-            return Ok(await _service.AddCategory(category));
+            var res=await _mediator.Send(category);
+            return Ok(res);
         }
 
         [HttpDelete("{Id}")]
         public async ValueTask<IActionResult> DeleteCateogory(long Id)
         {
-            return Ok(await _service.DeleteCategory(Id));
+            var res = await _mediator.Send(new DeleteCategoryCommands { Id = Id });
+            return NoContent();
         }
 
         [HttpGet("{Id}")]
         public async ValueTask<IActionResult> GetByCateogyId(long Id)
         {
-            return Ok(await _service.GetCategoryById(Id));
+            var res = await _mediator.Send(new GetByIdCategoryQuery { Id = Id });
+            return Ok(res);
         }
 
         [HttpGet("GetAll")]
         public async ValueTask<IActionResult> GetAllCategory()
         {
-            return Ok(await _service.GetAllCategory());
+            var res = await _mediator.Send(new GetAllCategoryQuery());
+            return Ok(res);
         }
 
         [HttpPut("{Id}")]
-        public async ValueTask<IActionResult> UpdateCateogry(CategoryDto category,long Id)
+        public async ValueTask<IActionResult> UpdateCateogry([FromBody]UpdateCategoryCommand command,long Id)
         {
-            return Ok(await _service.UpdateCategory(category, Id));
+            if (Id != command.Id)
+            {
+                return BadRequest();
+            }
+
+            var res = await _mediator.Send(command);
+            if (!res)
+            {
+                NotFound();
+            }
+            return NoContent();
         }
     }
 }

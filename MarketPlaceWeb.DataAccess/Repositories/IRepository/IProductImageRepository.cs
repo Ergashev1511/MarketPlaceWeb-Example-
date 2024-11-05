@@ -11,7 +11,7 @@ namespace MarketPlaceWeb.DataAccess.Repositories.IRepository
     {
         Task<bool>  AddImage(ProductImages productImages);
         Task<bool> UpdateImage(ProductImages productImages, long Id);
-        Task<bool> DeleteImage(long Id);
+        Task<bool> DeleteImage(ProductImages productImage);
         Task<ProductImages> GetByIdImages(long Id);
         Task<IEnumerable<ProductImages>> GetAllImages();
 

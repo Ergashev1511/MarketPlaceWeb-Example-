@@ -21,12 +21,6 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
         {
             try
             {
-                if (product == null) throw new ArgumentNullException("Product is not null");
-
-
-                var hascopy = await _dbContext.products.AnyAsync(a => a.Name == product.Name);
-                if (hascopy) throw new Exception("This Product already exist!");
-
                 await _dbContext.products.AddAsync(product);
                 await _dbContext.SaveChangesAsync();
                 return product.Id;
@@ -37,13 +31,10 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
             }
         }
 
-        public async Task<bool> DeleteProduct(long Id)
+        public async Task<bool> DeleteProduct(Product product)
         {
             try
             {
-                var product=await _dbContext.products.FirstOrDefaultAsync(a=>a.Id==Id);
-                if (product == null) throw new Exception("Product not found!");
-
                 _dbContext.products.Remove(product);  
                 await _dbContext.SaveChangesAsync();
                 return true;
@@ -86,17 +77,7 @@ namespace MarketPlaceWeb.DataAccess.Repositories.Repository
         {
             try
             {
-                var oldProduct=await _dbContext.products.FirstOrDefaultAsync(b=>b.Id==Id);
-
-                if (oldProduct == null) throw new Exception("Product not found!");
-
-                oldProduct.Name = product.Name;
-                oldProduct.Describtion = product.Describtion;
-                oldProduct.Price = product.Price;
-                oldProduct.CategoryId = product.CategoryId;
-
-
-                _dbContext.products.Update(oldProduct);
+                _dbContext.products.Update(product);
                 await _dbContext.SaveChangesAsync();
 
                 return true;

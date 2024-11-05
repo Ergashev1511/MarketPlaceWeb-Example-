@@ -11,7 +11,7 @@ namespace MarketPlaceWeb.DataAccess.Repositories.IRepository
     {
         Task<long> AddProduct(Product product);
         Task<bool> UpdateProduct(Product product,long Id);
-        Task<bool> DeleteProduct(long Id);
+        Task<bool> DeleteProduct(Product product);
         Task<List<Product>> GetAllProduct();
         Task<Product> GetProductById(long Id);
     }

@@ -1,5 +1,5 @@
-﻿using MarketPlaceWeb.Services.MediatR.Commands.ProductImageQuery;
-using MarketPlaceWeb.Services.Services.IServices;
+﻿using MarketPlaceWeb.DataAccess.Repositories.IRepository;
+using MarketPlaceWeb.Services.MediatR.Commands.ProductImageQuery;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -11,17 +11,18 @@ namespace MarketPlaceWeb.Services.MediatR.Handler.ProductImageHandler
 {
     public class DeleteProductImageCommandHandler : IRequestHandler<DeleteProductImageCommand, bool>
     {
-        private readonly IProductImageService _service;
-        public DeleteProductImageCommandHandler(IProductImageService service)
+        private readonly IProductImageRepository _repository;
+        public DeleteProductImageCommandHandler(IProductImageRepository repository)
         {
-            _service = service;
+            _repository = repository;   
         }
         async Task<bool>  IRequestHandler<DeleteProductImageCommand, bool>.Handle(DeleteProductImageCommand request, CancellationToken cancellationToken)
         {
-            var productImage = await _service.GetByIdProductImage(request.Id);
-            if(productImage == null) return false;
+            var productImage = await _repository.GetByIdImages(request.Id);
 
-            await _service.DeleteProductImage(request.Id);
+            if (productImage == null) throw new Exception("ProductImage not found");
+
+            await _repository.DeleteImage(productImage);
             return true;
         }
     }
